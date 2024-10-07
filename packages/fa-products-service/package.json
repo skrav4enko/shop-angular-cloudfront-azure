@@ -1,0 +1,22 @@
+{
+  "name": "@fa/products-service",
+  "version": "1.0.0",
+  "description": "Products service",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start",
+    "test": "echo \"No tests yet...\"",
+    "deploy": "func azure functionapp publish fa-product-services-ne-001 --force"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@azure/functions": "^3.5.1",
+    "azure-functions-core-tools": "^4.0.3971",
+    "@types/node": "20.0.0",
+    "ts-node": "10.9.2",
+    "typescript": "^4.2.3"
+  }
+}

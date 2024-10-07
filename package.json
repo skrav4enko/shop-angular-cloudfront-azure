@@ -70,5 +70,8 @@
     "*.{ts,html}": [
       "eslint --fix"
     ]
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
