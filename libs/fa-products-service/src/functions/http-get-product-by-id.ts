@@ -4,7 +4,7 @@ import {
   HttpResponseInit,
   InvocationContext,
 } from '@azure/functions';
-import { products } from '../shared/mocks/products';
+import { products } from './shared/mocks/products';
 
 export async function productByIdHandler(
   request: HttpRequest,

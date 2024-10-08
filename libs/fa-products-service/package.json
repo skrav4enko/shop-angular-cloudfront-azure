@@ -1,5 +1,5 @@
 {
-  "name": "@fa/products-service",
+  "name": "fa-products-service",
   "version": "1.0.0",
   "description": "Products service",
   "main": "dist/src/functions/*.js",
@@ -10,7 +10,7 @@
     "prestart": "npm run clean && npm run build",
     "start": "func start",
     "test": "echo \"No tests yet...\"",
-    "deploy": "func azure functionapp publish fa-product-services-ne-001 --force"
+    "deploy": "func azure functionapp publish fa-product-services-ne-001"
   },
   "dependencies": {
     "@azure/functions": "^4.5.1"
