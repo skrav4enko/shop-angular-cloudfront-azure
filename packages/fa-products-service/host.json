@@ -4,8 +4,7 @@
     "applicationInsights": {
       "samplingSettings": {
         "isEnabled": true,
-        "excludedTypes": "Request",
-        "includedTypes": "Exception"
+        "excludedTypes": "Request"
       }
     }
   },
