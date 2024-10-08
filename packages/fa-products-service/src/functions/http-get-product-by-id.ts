@@ -6,11 +6,11 @@ import {
 } from '@azure/functions';
 import { products } from '../shared/mocks/products';
 
-export async function productByIdFn(
+export async function productByIdHandler(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
-  context.log('HTTP trigger function processed a request.');
+  context.log(`Http function processed request for url "${request.url}"`);
 
   const productId = Number(request.params.productId);
 
@@ -40,5 +40,5 @@ app.http('productById', {
   methods: ['GET'],
   authLevel: 'anonymous',
   route: 'products/{productId}',
-  handler: productByIdFn,
+  handler: productByIdHandler,
 });
