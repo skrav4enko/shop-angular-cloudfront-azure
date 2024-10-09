@@ -10,7 +10,8 @@
     "prestart": "npm run clean && npm run build",
     "start": "func start",
     "test": "echo \"No tests yet...\"",
-    "deploy": "func azure functionapp publish fa-product-services-ne-001"
+    "deploy": "func azure functionapp publish fa-product-services-ne-001",
+    "deploy:staging": "func azure functionapp publish fa-product-services-ne-001 --slot staging"
   },
   "dependencies": {
     "@azure/functions": "^4.5.1"
