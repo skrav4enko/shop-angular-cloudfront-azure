@@ -87,3 +87,113 @@ resource "azurerm_windows_function_app" "product_services" {
     ]
   }
 }
+
+# Create an App Configuration
+resource "azurerm_app_configuration" "product_services_config" {
+  name     = "appconfig-product-services-ne-001"
+  location = "northeurope"
+
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+
+  sku = "free"
+}
+
+# Create an API Management
+resource "azurerm_api_management" "product_services_apim" {
+  name            = "apim-product-services-ne-001"
+  location        = "northeurope"
+  publisher_email = "serhii_kravchenko1@epam.com"
+  publisher_name  = "Serhii Kravchenko"
+
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+  sku_name            = "Consumption_0"
+}
+
+# Create an API Management API
+resource "azurerm_api_management_api" "product_services_api" {
+  name                = "products-service-api"
+  api_management_name = azurerm_api_management.product_services_apim.name
+  revision            = "1"
+
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+
+  display_name = "Products Service API"
+
+  protocols = ["https"]
+}
+
+
+data "azurerm_function_app_host_keys" "products_keys" {
+  name                = azurerm_windows_function_app.product_services.name
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+}
+
+# Create an API Management Backend
+resource "azurerm_api_management_backend" "products_fa" {
+  name                = "products-service-backend"
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+  api_management_name = azurerm_api_management.product_services_apim.name
+  protocol            = "http"
+  url                 = "https://${azurerm_windows_function_app.product_services.name}.azurewebsites.net/api"
+  description         = "Products API"
+
+  credentials {
+    certificate = []
+    query       = {}
+
+    header = {
+      "x-functions-key" = data.azurerm_function_app_host_keys.products_keys.default_function_key
+    }
+  }
+}
+
+# Create an API Policy
+resource "azurerm_api_management_api_policy" "api_policy" {
+  api_management_name = azurerm_api_management.product_services_apim.name
+  api_name            = azurerm_api_management_api.product_services_api.name
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+
+  xml_content = <<XML
+  <policies>
+      <inbound>
+          <set-backend-service backend-id="${azurerm_api_management_backend.products_fa.name}"/>
+          <base/>
+      </inbound>
+      <backend>
+          <base/>
+      </backend>
+      <outbound>
+          <base/>
+      </outbound>
+      <on-error>
+          <base/>
+      </on-error>
+  </policies>
+  XML
+}
+
+resource "azurerm_api_management_api_operation" "get_products" {
+  api_management_name = azurerm_api_management.product_services_apim.name
+  api_name            = azurerm_api_management_api.product_services_api.name
+  display_name        = "Get Products"
+  method              = "GET"
+  operation_id        = "get-products"
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+  url_template        = "/products"
+}
+
+resource "azurerm_api_management_api_operation" "get_product_by_id" {
+  api_management_name = azurerm_api_management.product_services_apim.name
+  api_name            = azurerm_api_management_api.product_services_api.name
+  display_name        = "Get Product By Id"
+  method              = "GET"
+  operation_id        = "get-product-by-id"
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+  url_template        = "/products/{productId}"
+
+  template_parameter {
+    name     = "productId"
+    type     = "number"
+    required = true
+  }
+}

@@ -14,6 +14,7 @@
     "deploy:staging": "func azure functionapp publish fa-product-services-ne-001 --slot staging"
   },
   "dependencies": {
+    "@azure/app-configuration": "1.7.0",
     "@azure/functions": "^4.5.1"
   },
   "devDependencies": {
