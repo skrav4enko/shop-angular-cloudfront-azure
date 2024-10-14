@@ -1,0 +1,26 @@
+{
+  "name": "fa-products-service",
+  "version": "1.0.0",
+  "description": "Products service",
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "rimraf dist",
+    "prestart": "npm run clean && npm run build",
+    "start": "func start",
+    "test": "echo \"No tests yet...\"",
+    "deploy": "func azure functionapp publish fa-product-services-ne-001",
+    "deploy:staging": "func azure functionapp publish fa-product-services-ne-001 --slot staging"
+  },
+  "dependencies": {
+    "@azure/app-configuration": "1.7.0",
+    "@azure/functions": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "azure-functions-core-tools": "^4.0.6280",
+    "typescript": "^5.6.2",
+    "rimraf": "^5.0.0"
+  }
+}

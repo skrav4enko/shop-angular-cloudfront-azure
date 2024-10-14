@@ -2,6 +2,7 @@
 
 # compiled output
 /dist
+dist
 /tmp
 /out-tsc
 # Only exists if Bazel was run
@@ -9,6 +10,7 @@
 
 # dependencies
 /node_modules
+node_modules
 
 # profiling files
 chrome-profiler-events*.json
@@ -83,3 +85,8 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+
+# Ignore local development settings in real codebase
+
+# local.settings.json
