@@ -1,11 +1,11 @@
 resource "azurerm_resource_group" "product-services-rg" {
   name     = "rg-product-services-ne-001"
-  location = "northeurope"
+  location = var.location
 }
 
 resource "azurerm_storage_account" "product_services_storage_account" {
   name     = "stgproductsne002"
-  location = "northeurope"
+  location = var.location
 
   account_replication_type = "LRS"
   account_tier             = "Standard"
@@ -23,7 +23,7 @@ resource "azurerm_storage_share" "product_services_storage_share" {
 
 resource "azurerm_service_plan" "product_services_service_plan" {
   name     = "asp-product-services-ne-001"
-  location = "northeurope"
+  location = var.location
 
   os_type  = "Windows"
   sku_name = "Y1"
@@ -33,7 +33,7 @@ resource "azurerm_service_plan" "product_services_service_plan" {
 
 resource "azurerm_application_insights" "product_services_application_insights" {
   name             = "appins-fa-product-services-ne-001"
-  location         = "northeurope"
+  location         = var.location
   application_type = "web"
 
   resource_group_name = azurerm_resource_group.product-services-rg.name
@@ -41,7 +41,7 @@ resource "azurerm_application_insights" "product_services_application_insights" 
 
 resource "azurerm_windows_function_app" "product_services" {
   name     = "fa-product-services-ne-001"
-  location = "northeurope"
+  location = var.location
 
   service_plan_id     = azurerm_service_plan.product_services_service_plan.id
   resource_group_name = azurerm_resource_group.product-services-rg.name
@@ -66,13 +66,21 @@ resource "azurerm_windows_function_app" "product_services" {
     }
 
     application_stack {
-      node_version = "~16"
+      node_version = "~18"
     }
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 
   app_settings = {
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING = azurerm_storage_account.product_services_storage_account.primary_connection_string
     WEBSITE_CONTENTSHARE                     = azurerm_storage_share.product_services_storage_share.name
+    DB_URI                                   = azurerm_cosmosdb_account.products_db_account.endpoint
+    DB_NAME                                  = azurerm_cosmosdb_sql_database.products_db.name
+    DOTNET_USE_POLLING_FILE_WATCHER          = 1
+    WEBSITE_RUN_FROM_PACKAGE                 = 1
   }
 
   # The app settings changes cause downtime on the Function App. e.g. with Azure Function App Slots
@@ -91,7 +99,7 @@ resource "azurerm_windows_function_app" "product_services" {
 # Create an App Configuration
 resource "azurerm_app_configuration" "product_services_config" {
   name     = "appconfig-product-services-ne-001"
-  location = "northeurope"
+  location = var.location
 
   resource_group_name = azurerm_resource_group.product-services-rg.name
 
@@ -101,7 +109,7 @@ resource "azurerm_app_configuration" "product_services_config" {
 # Create an API Management
 resource "azurerm_api_management" "product_services_apim" {
   name            = "apim-product-services-ne-001"
-  location        = "northeurope"
+  location        = var.location
   publisher_email = "serhii_kravchenko1@epam.com"
   publisher_name  = "Serhii Kravchenko"
 
@@ -196,4 +204,8 @@ resource "azurerm_api_management_api_operation" "get_product_by_id" {
     type     = "number"
     required = true
   }
+}
+
+output "function_app_principal_id" {
+  value = azurerm_windows_function_app.products_service.identity[0].principal_id
 }
