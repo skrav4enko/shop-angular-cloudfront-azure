@@ -1,7 +1,6 @@
 export interface Product {
-  id: number;
+  id: string; // UUID, primary and partition key
   title: string;
   description: string;
   price: number;
-  count: number;
 }

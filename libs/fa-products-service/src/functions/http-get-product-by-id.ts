@@ -4,15 +4,8 @@ import {
   HttpResponseInit,
   InvocationContext,
 } from '@azure/functions';
-import { products } from './shared/mocks/products';
 
-import { AppConfigurationClient } from '@azure/app-configuration';
-
-const connection_string = process.env.AZURE_APP_CONFIG_CONNECTION_STRING;
-const client = new AppConfigurationClient(connection_string);
-const exampleKey = client.getConfigurationSetting({
-  key: 'DATA_FROM_APP_CONFIG',
-});
+import { getProductById } from './db/products-db';
 
 export async function productByIdHandler(
   request: HttpRequest,
@@ -20,10 +13,7 @@ export async function productByIdHandler(
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
 
-  const { value } = await exampleKey;
-  context.log(`App Configuration variable: ${value}`);
-
-  const productId = Number(request.params.productId);
+  const productId = request.params.productId;
 
   if (!productId) {
     return {
@@ -32,7 +22,7 @@ export async function productByIdHandler(
     };
   }
 
-  const product = products.find((p) => p.id === productId);
+  const product = await getProductById(productId);
 
   if (!product) {
     return {
@@ -50,6 +40,6 @@ export async function productByIdHandler(
 app.http('productById', {
   methods: ['GET'],
   authLevel: 'anonymous',
-  route: 'products/{productId}',
+  route: 'products/{productId:guid}',
   handler: productByIdHandler,
 });
