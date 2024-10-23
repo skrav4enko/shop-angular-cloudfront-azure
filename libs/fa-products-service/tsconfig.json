@@ -1,10 +1,18 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "target": "es6",
     "outDir": "dist",
     "rootDir": ".",
+    "skipLibCheck": true,
     "sourceMap": true,
-    "strict": false
-  }
+    "strict": false,
+    "incremental": true
+  },
+  "ts-node": {
+    "files": true
+  },
+  "exclude": ["node_modules"]
 }

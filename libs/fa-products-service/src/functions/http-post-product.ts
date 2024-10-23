@@ -5,44 +5,44 @@ import {
   InvocationContext,
 } from '@azure/functions';
 import { randomUUID } from 'crypto';
-import { products } from './shared/mocks/products';
-import { Product } from './shared/models/Product';
+import { createProduct, ProductDto } from './db/products-db';
 
 export async function createProductHandler(
   request: HttpRequest,
   context: InvocationContext,
 ): Promise<HttpResponseInit> {
-  const body: Partial<Product> = await request.json();
+  const body: Partial<ProductDto> = await request.json();
+  context.info(`Http function processed POST request with data: `, body);
 
-  context.info(`Http function processed post request with data: `, body);
+  if (!body.title || !body.price || !body.description || !body.count) {
+    return {
+      status: 400,
+      body: 'Please pass title, price, description and count in the request body',
+    };
+  }
 
-  const newProduct: Product = {
-    id: randomUUID(),
-    title: body.title ?? 'Default Title', // Ensure title is provided
-    description: body.description ?? 'Default Description', // Ensure description is provided
-    price: body.price ?? 0, // Ensure price is provided
-    count: body.count ?? 0, // Ensure count is provided
+  const id = randomUUID();
+  const newProduct: ProductDto = {
+    id,
+    price: body.price,
+    title: body.title,
+    description: body.description,
+    count: body.count,
   };
 
-  context.info('Created product entity');
+  const createdProduct = await createProduct(newProduct);
 
-  // const stock: StockEntity = {
-  //   id,
-  //   product_id: id,
-  //   count: productDto.count,
-  // };
-
-  products.push(newProduct);
-
-  context.info('Created stock entity');
+  context.info(`Created product and stock entity with ${id}`);
 
   return {
     status: 201,
-    jsonBody: JSON.stringify(newProduct),
+    jsonBody: {
+      ...createdProduct,
+    },
   };
 }
 
-app.http('create-product', {
+app.http('createProduct', {
   methods: ['POST'],
   authLevel: 'anonymous',
   route: 'products',

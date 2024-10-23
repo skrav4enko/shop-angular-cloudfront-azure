@@ -1,9 +1,15 @@
-resource "azurerm_cosmosdb_account" "products_db_account" {
-  name                = "cos-products-ne-001"
+resource "azurerm_user_assigned_identity" "user" {
+  name                = "example-user"
   location            = var.location
   resource_group_name = azurerm_resource_group.product-services-rg.name
+}
+
+resource "azurerm_cosmosdb_account" "products_db_account" {
+  name                = "cos-products-service-ne-001"
+  location            = var.location
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
+  resource_group_name = azurerm_resource_group.product-services-rg.name
 
   consistency_policy {
     consistency_level = "Eventual"
@@ -17,13 +23,10 @@ resource "azurerm_cosmosdb_account" "products_db_account" {
     location          = var.location
     failover_priority = 0
   }
-
-  enable_automatic_failover       = false
-  enable_multiple_write_locations = false
 }
 
 resource "azurerm_cosmosdb_sql_database" "products_db" {
-  name                = "db-products-ne-001"
+  name                = "products-db"
   account_name        = azurerm_cosmosdb_account.products_db_account.name
   resource_group_name = azurerm_resource_group.product-services-rg.name
 }

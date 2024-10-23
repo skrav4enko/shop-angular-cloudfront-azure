@@ -206,6 +206,22 @@ resource "azurerm_api_management_api_operation" "get_product_by_id" {
   }
 }
 
-output "function_app_principal_id" {
-  value = azurerm_windows_function_app.products_service.identity[0].principal_id
+resource "azurerm_api_management_api_operation" "create_product" {
+  api_management_name = azurerm_api_management.product_services_apim.name
+  api_name            = azurerm_api_management_api.product_services_api.name
+  display_name        = "Create Product"
+  method              = "POST"
+  operation_id        = "post-product"
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+  url_template        = "/products"
+}
+
+resource "azurerm_api_management_api_operation" "get_products_total" {
+  api_management_name = azurerm_api_management.product_services_apim.name
+  api_name            = azurerm_api_management_api.product_services_api.name
+  display_name        = "Get Products Total"
+  method              = "GET"
+  operation_id        = "get-products-total"
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+  url_template        = "/products/total"
 }
