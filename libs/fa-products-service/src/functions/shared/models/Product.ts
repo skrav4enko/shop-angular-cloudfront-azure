@@ -1,9 +1,6 @@
-import { UUID } from 'crypto';
-
 export interface Product {
-  id: UUID | number;
+  id: string; // UUID, primary and partition key
   title: string;
   description: string;
   price: number;
-  count: number;
 }
