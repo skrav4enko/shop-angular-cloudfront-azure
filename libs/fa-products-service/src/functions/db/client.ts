@@ -1,11 +1,9 @@
 import { CosmosClient, Database } from '@azure/cosmos';
-// import { DefaultAzureCredential } from '@azure/identity';
-
-// const credential = new DefaultAzureCredential();
+import { DefaultAzureCredential } from '@azure/identity';
 
 const DB_URI = process.env['DB_URI'];
 const DB_NAME = process.env['DB_NAME'];
-const COSMOS_KEY = process.env['COSMOS_KEY'];
+// const COSMOS_KEY = process.env['COSMOS_KEY'];
 
 const PRODUCT_CONTAINER_NAME = 'products';
 const STOCK_CONTAINER_NAME = 'stocks';
@@ -17,10 +15,12 @@ class CosmosDbClient {
       return this.client;
     }
 
+    const credential = new DefaultAzureCredential();
+
     this.client = new CosmosClient({
       endpoint: DB_URI,
-      key: COSMOS_KEY,
-      // aadCredentials: credential,
+      // key: COSMOS_KEY,   // switch to if identity fails
+      aadCredentials: credential,
     });
 
     return this.client;

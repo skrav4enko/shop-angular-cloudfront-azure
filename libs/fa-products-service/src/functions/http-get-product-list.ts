@@ -4,7 +4,7 @@ import {
   HttpResponseInit,
   InvocationContext,
 } from '@azure/functions';
-import { getProducts } from './db/products-db';
+import { getProducts, ProductDto } from './db/products-db';
 
 export async function productsHandler(
   request: HttpRequest,
@@ -12,7 +12,20 @@ export async function productsHandler(
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
 
-  const products = await getProducts();
+  let products: ProductDto[];
+
+  try {
+    products = await getProducts();
+
+    context.info(`Got products: ${products.length}`);
+  } catch (error) {
+    context.error('Error getting products', error);
+
+    return {
+      status: 500,
+      body: 'Error getting products',
+    };
+  }
 
   return {
     // status: 200, /* Defaults to 200 */

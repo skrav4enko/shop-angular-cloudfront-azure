@@ -15,6 +15,8 @@ export async function createProductHandler(
   context.info(`Http function processed POST request with data: `, body);
 
   if (!body.title || !body.price || !body.description || !body.count) {
+    context.error('Invalid request body', body);
+
     return {
       status: 400,
       body: 'Please pass title, price, description and count in the request body',
@@ -30,9 +32,20 @@ export async function createProductHandler(
     count: body.count,
   };
 
-  const createdProduct = await createProduct(newProduct);
+  let createdProduct: ProductDto;
 
-  context.info(`Created product and stock entity with ${id}`);
+  try {
+    createdProduct = await createProduct(newProduct);
+
+    context.info(`Created product and stock entity with ${id}`);
+  } catch (error) {
+    context.error('Error creating product', error);
+
+    return {
+      status: 500,
+      body: 'Error creating product',
+    };
+  }
 
   return {
     status: 201,

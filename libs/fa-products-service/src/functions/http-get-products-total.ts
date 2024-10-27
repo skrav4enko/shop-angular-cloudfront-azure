@@ -12,7 +12,20 @@ export async function productsTotalHandler(
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
 
-  const totalCount = await getProductsTotal();
+  let totalCount: number;
+
+  try {
+    totalCount = await getProductsTotal();
+
+    context.info(`Got products total: ${totalCount}`);
+  } catch (error) {
+    context.error('Error getting products total', error);
+
+    return {
+      status: 500,
+      body: 'Error getting products total',
+    };
+  }
 
   return {
     // status: 200, /* Defaults to 200 */

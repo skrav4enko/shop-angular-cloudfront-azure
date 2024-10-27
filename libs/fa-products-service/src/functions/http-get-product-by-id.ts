@@ -5,7 +5,7 @@ import {
   InvocationContext,
 } from '@azure/functions';
 
-import { getProductById } from './db/products-db';
+import { getProductById, ProductDto } from './db/products-db';
 
 export async function productByIdHandler(
   request: HttpRequest,
@@ -16,15 +16,32 @@ export async function productByIdHandler(
   const productId = request.params.productId;
 
   if (!productId) {
+    context.error(`Invalid product id: ${productId}`);
+
     return {
       status: 400,
       body: 'Please pass a valid product id',
     };
   }
 
-  const product = await getProductById(productId);
+  let product: ProductDto | null;
+
+  try {
+    product = await getProductById(productId);
+
+    context.info(`Got product: ${productId}`);
+  } catch (error) {
+    context.error('Error getting product', error);
+
+    return {
+      status: 500,
+      body: 'Error getting product',
+    };
+  }
 
   if (!product) {
+    context.error(`Product not found: ${productId}`);
+
     return {
       status: 404,
       body: 'Product not found',

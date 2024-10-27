@@ -5,7 +5,7 @@ import { Product } from '../shared/models/Product';
 import { Stock } from '../shared/models/Stock';
 import { CosmosDb } from './client';
 
-const productsAmount = 1;
+const productsAmount = 3;
 
 const generateProductsIds = (amount: number): string[] => {
   return Array.from({ length: amount }, () => faker.string.uuid());

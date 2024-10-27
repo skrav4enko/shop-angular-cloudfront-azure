@@ -1,23 +1,36 @@
-resource "azurerm_role_definition" "custom_role" {
-  name        = "custom-db-role"
-  description = "Custom role to manage Cosmos DB"
+data "azurerm_client_config" "current" {}
 
-  scope = azurerm_cosmosdb_account.products_db_account.id
+resource "azurerm_cosmosdb_sql_role_definition" "products_db_role" {
+  name = "custom-sql-role"
+
+  type = "CustomRole"
+
+  account_name        = azurerm_cosmosdb_account.products_db_account.name
+  resource_group_name = azurerm_resource_group.product-services-rg.name
 
   assignable_scopes = [azurerm_cosmosdb_account.products_db_account.id]
 
   permissions {
-    actions = [
-      "Microsoft.DocumentDB/databaseAccounts/read",
-      "Microsoft.DocumentDB/databaseAccounts/write",
-      "Microsoft.DocumentDB/databaseAccounts/listKeys/action"
+    data_actions = [
+      "Microsoft.DocumentDB/databaseAccounts/readMetadata",
+      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*",
+      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*"
     ]
-    not_actions = []
   }
 }
 
-resource "azurerm_role_assignment" "cosmosdb_access" {
-  scope                = azurerm_cosmosdb_account.products_db_account.id
-  role_definition_name = azurerm_role_definition.custom_role.name
-  principal_id         = azurerm_cosmosdb_account.products_db_account.identity.0.principal_id
+resource "azurerm_cosmosdb_sql_role_assignment" "products_db_role_assigment" {
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+  account_name        = azurerm_cosmosdb_account.products_db_account.name
+  role_definition_id  = azurerm_cosmosdb_sql_role_definition.products_db_role.id
+  principal_id        = data.azurerm_client_config.current.object_id
+  scope               = azurerm_cosmosdb_account.products_db_account.id
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "products_db_role_assigment_function_app" {
+  resource_group_name = azurerm_resource_group.product-services-rg.name
+  account_name        = azurerm_cosmosdb_account.products_db_account.name
+  role_definition_id  = azurerm_cosmosdb_sql_role_definition.products_db_role.id
+  principal_id        = azurerm_windows_function_app.product_services.identity.0.principal_id
+  scope               = azurerm_cosmosdb_account.products_db_account.id
 }
