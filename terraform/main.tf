@@ -17,12 +17,12 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "front_end_rg" {
   name     = "rg-frontend-sand-ne-001"
-  location = "northeurope"
+  location = var.location
 }
 
 resource "azurerm_storage_account" "front_end_storage_account" {
   name     = "stgfrontendsandne001"
-  location = "northeurope"
+  location = var.location
 
   account_replication_type = "LRS"
   account_tier             = "Standard"

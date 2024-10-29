@@ -4,15 +4,8 @@ import {
   HttpResponseInit,
   InvocationContext,
 } from '@azure/functions';
-import { products } from './shared/mocks/products';
 
-import { AppConfigurationClient } from '@azure/app-configuration';
-
-const connection_string = process.env.AZURE_APP_CONFIG_CONNECTION_STRING;
-const client = new AppConfigurationClient(connection_string);
-const exampleKey = client.getConfigurationSetting({
-  key: 'DATA_FROM_APP_CONFIG',
-});
+import { getProductById, ProductDto } from './db/products-db';
 
 export async function productByIdHandler(
   request: HttpRequest,
@@ -20,21 +13,35 @@ export async function productByIdHandler(
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
 
-  const { value } = await exampleKey;
-  context.log(`App Configuration variable: ${value}`);
-
-  const productId = Number(request.params.productId);
+  const productId = request.params.productId;
 
   if (!productId) {
+    context.error(`Invalid product id: ${productId}`);
+
     return {
       status: 400,
       body: 'Please pass a valid product id',
     };
   }
 
-  const product = products.find((p) => p.id === productId);
+  let product: ProductDto | null;
+
+  try {
+    product = await getProductById(productId);
+
+    context.info(`Got product: ${productId}`);
+  } catch (error) {
+    context.error('Error getting product', error);
+
+    return {
+      status: 500,
+      body: 'Error getting product',
+    };
+  }
 
   if (!product) {
+    context.error(`Product not found: ${productId}`);
+
     return {
       status: 404,
       body: 'Product not found',
@@ -50,6 +57,6 @@ export async function productByIdHandler(
 app.http('productById', {
   methods: ['GET'],
   authLevel: 'anonymous',
-  route: 'products/{productId}',
+  route: 'products/{productId:guid}',
   handler: productByIdHandler,
 });
