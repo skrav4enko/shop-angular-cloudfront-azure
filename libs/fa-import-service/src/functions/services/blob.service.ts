@@ -45,7 +45,7 @@ export class StorageBlobClientService {
     );
   }
 
-  static getBlobSasUrl(blobName: string) {
+  static getBlobSasUrl(blobName: string): string {
     const containerName = UPLOADED_CONTAINER_NAME;
 
     const containerClient = StorageBlobClientService.getUploadContainer();
