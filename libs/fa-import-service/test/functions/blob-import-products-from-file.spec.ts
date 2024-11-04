@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { importProductsFromFileHandler } from '../../src/functions/blob-import-products-from-file'; // Update with the correct path to your function file
-import { StorageBlobClientService } from '../../src/functions/services/blob.service'; // Update with the correct path
+import { importProductsFromFileHandler } from '../../src/functions/blob-import-products-from-file';
+import { StorageBlobClientService } from '../../src/functions/services/blob.service';
 
-// Mocking the BlobServiceClient and related methods
 vi.mock('../../src/functions/services/blob.service', () => ({
   StorageBlobClientService: {
     getParsedContainer: vi.fn().mockReturnValue({

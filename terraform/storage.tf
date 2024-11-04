@@ -110,7 +110,7 @@ resource "azurerm_windows_function_app" "import_service" {
 
   lifecycle {
     ignore_changes = [
-      app_settings,
+      app_settings,                     // TODO: check how it works with changes of AZURE_STORAGE_* values
       site_config["application_stack"], // workaround for a bug when azure just "kills" your app
       tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],

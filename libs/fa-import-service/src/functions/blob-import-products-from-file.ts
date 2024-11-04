@@ -47,8 +47,9 @@ export async function importProductsFromFileHandler(
 
     context.log('CSV file successfully processed');
 
-    context.log('Blob moved to parsed container');
     await moveBlob(fileName);
+
+    context.log('Blob moved to parsed container');
 
     return;
   } catch (error) {
