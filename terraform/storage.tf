@@ -106,11 +106,13 @@ resource "azurerm_windows_function_app" "import_service" {
     FUNCTIONS_WORKER_RUNTIME                 = "node"
     AZURE_STORAGE_ACCOUNT_NAME               = azurerm_storage_account.import_service_storage_account.name
     AZURE_STORAGE_KEY                        = azurerm_storage_account.import_service_storage_account.primary_access_key
+    SB_CONNECTION_STRING                     = azurerm_servicebus_namespace.servicebus_namespace.default_primary_connection_string
+    SB_PRODUCTS_IMPORT_QUEUE_NAME            = var.sb_topic_queue_name
   }
 
   lifecycle {
     ignore_changes = [
-      app_settings,                     // TODO: check how it works with changes of AZURE_STORAGE_* values
+      # app_settings,                     // TODO: check how it works with changes of AZURE_STORAGE_* values
       site_config["application_stack"], // workaround for a bug when azure just "kills" your app
       tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],

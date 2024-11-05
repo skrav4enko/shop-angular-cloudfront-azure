@@ -1,6 +1,8 @@
 import { app, InvocationContext } from '@azure/functions';
 import { parse } from 'csv-parse';
 import { StorageBlobClientService } from './services/blob.service';
+import { SbService } from './services/sb.service';
+import { setTimeout } from 'timers/promises';
 
 async function moveBlob(fileName: string): Promise<void> {
   const parsedContainer = StorageBlobClientService.getParsedContainer();
@@ -33,6 +35,9 @@ export async function importProductsFromFileHandler(
   const fileName = context.triggerMetadata.name as string;
   const fileContent = blob.toString('utf8');
 
+  const sbClient = SbService.getSbClient();
+  const sender = SbService.getProductsSender();
+
   try {
     const parser = parse(fileContent, {
       columns: true,
@@ -43,6 +48,18 @@ export async function importProductsFromFileHandler(
 
     for await (const record of parser) {
       context.log('Product', record);
+      try {
+        context.log('sending', record);
+        await sender.sendMessages({
+          body: record,
+          // applicationProperties: {
+          //   index: chunkIndex,
+          // },
+        });
+      } catch (error) {
+        context.error('Error sending message to Service Bus:', error);
+        // throw error; // Re-throw the error to trigger retry mechanism
+      }
     }
 
     context.log('CSV file successfully processed');
@@ -54,7 +71,13 @@ export async function importProductsFromFileHandler(
     return;
   } catch (error) {
     context.error('Error processing file:', error);
-    throw error; // Re-throw the error to trigger retry mechanism
+    // throw error; // Re-throw the error to trigger retry mechanism
+  } finally {
+    await setTimeout(3_000);
+    await sender.close();
+    await sbClient.close();
+
+    context.log('Function execution completed');
   }
 }
 
