@@ -9,7 +9,7 @@
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",
     "start": "func start",
-    "test": "echo \"No tests yet...\"",
+    "test": "vitest",
     "db:seed": "ts-node -r tsconfig-paths/register -r ./src/functions/utils/setup-env.ts ./src/functions/db/seed.ts",
     "deploy": "func azure functionapp publish fa-product-services-ne-001",
     "deploy:staging": "func azure functionapp publish fa-product-services-ne-001 --slot staging"

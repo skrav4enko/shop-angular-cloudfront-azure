@@ -83,7 +83,7 @@ resource "azurerm_windows_function_app" "product_services" {
     DB_URI                                   = azurerm_cosmosdb_account.products_db_account.endpoint
     DB_NAME                                  = azurerm_cosmosdb_sql_database.products_db.name
     SB_CONNECTION_STRING                     = azurerm_servicebus_namespace.servicebus_namespace.default_primary_connection_string
-    SB_PRODUCTS_IMPORT_QUEUE_NAME            = var.sb_topic_queue_name
+    SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE_NAME   = var.sb_topic_or_queue_name
   }
 
   # The app settings changes cause downtime on the Function App. e.g. with Azure Function App Slots

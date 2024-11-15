@@ -35,8 +35,10 @@ export async function importProductsFromFileHandler(
   const fileName = context.triggerMetadata.name as string;
   const fileContent = blob.toString('utf8');
 
+  const queueOrTopicName = process.env.SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE_NAME;
+
   const sbClient = SbService.getSbClient();
-  const sender = SbService.getProductsSender(sbClient);
+  const sender = SbService.getProductsSender(sbClient, queueOrTopicName);
 
   try {
     const parser = parse(fileContent, {
@@ -46,15 +48,17 @@ export async function importProductsFromFileHandler(
 
     context.log('Parsing CSV data...');
 
+    let index = -1;
     for await (const record of parser) {
-      context.log('Product', record);
       try {
-        context.log('sending', record);
+        context.log('Sending to Service Bus:', queueOrTopicName);
+        context.log('Product sending...', record);
+        index++;
         await sender.sendMessages({
           body: record,
-          // applicationProperties: {
-          //   index: chunkIndex,
-          // },
+          applicationProperties: {
+            index,
+          },
         });
       } catch (error) {
         context.error('Error sending message to Service Bus:', error);
@@ -68,9 +72,11 @@ export async function importProductsFromFileHandler(
 
     context.log('Blob moved to parsed container');
 
-    return;
+    return Promise.resolve();
   } catch (error) {
     context.error('Error processing file:', error);
+
+    return Promise.reject();
     // throw error; // Re-throw the error to trigger retry mechanism
   } finally {
     await setTimeout(3_000);

@@ -3,6 +3,6 @@ variable "location" {
   default     = "northeurope"
 }
 
-variable "sb_topic_queue_name" {
-  default = "products-import-queue"
+variable "sb_topic_or_queue_name" {
+  default = "products-import-topic"
 }

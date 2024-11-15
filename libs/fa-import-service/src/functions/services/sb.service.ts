@@ -11,13 +11,14 @@ export class SbService {
     return new ServiceBusClient(connectionString);
   }
 
-  static getProductsSender(client: ServiceBusClient): ServiceBusSender {
-    const queueName = process.env.SB_PRODUCTS_IMPORT_QUEUE_NAME;
-
-    if (!queueName) {
-      throw new Error('SB_PRODUCTS_IMPORT_QUEUE_NAME is not defined');
+  static getProductsSender(
+    client: ServiceBusClient,
+    queueOrTopicName: string,
+  ): ServiceBusSender {
+    if (!queueOrTopicName) {
+      throw new Error('SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE_NAME is not defined');
     }
 
-    return client.createSender(queueName);
+    return client.createSender(queueOrTopicName);
   }
 }

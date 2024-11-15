@@ -34,7 +34,8 @@ resource "azurerm_servicebus_subscription_rule" "type_product" {
   subscription_id = azurerm_servicebus_subscription.product_sub.id
   filter_type     = "SqlFilter"
 
-  sql_filter = "type = 'product'"
+  # sql_filter = "type = 'product'"
+  sql_filter = "index % 2 = 0" # Simulate Even numbers filter
 }
 
 resource "azurerm_servicebus_subscription" "stock_sub" {
@@ -48,5 +49,6 @@ resource "azurerm_servicebus_subscription_rule" "type_stock" {
   subscription_id = azurerm_servicebus_subscription.stock_sub.id
   filter_type     = "SqlFilter"
 
-  sql_filter = "type = 'stock'"
+  # sql_filter = "type = 'stock'"
+  sql_filter = "index % 2 != 0" # Simulate Odd numbers filter
 }

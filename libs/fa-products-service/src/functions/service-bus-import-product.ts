@@ -41,22 +41,22 @@ export async function serviceBusQueueHandler(
   }
 }
 
-app.serviceBusQueue('serviceBusImportProduct', {
+// app.serviceBusQueue('serviceBusImportProduct', {
+//   connection: 'SB_CONNECTION_STRING',
+//   queueName: process.env.SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE_NAME,
+//   handler: serviceBusQueueHandler,
+// });
+
+app.serviceBusTopic('serviceBusImportProductSub', {
   connection: 'SB_CONNECTION_STRING',
-  queueName: process.env.SB_PRODUCTS_IMPORT_QUEUE_NAME,
+  topicName: process.env.SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE_NAME,
+  subscriptionName: 'sb_product_subscription',
   handler: serviceBusQueueHandler,
 });
 
-// app.serviceBusTopic('serviceBusImportProduct', {
-//   connection: 'SB_CONNECTION_STRING',
-//   topicName: process.env.SB_PRODUCTS_IMPORT_TOPIC_NAME,
-//   subscriptionName: 'sb_product_subscription',
-//   handler: serviceBusQueueHandler,
-// });
-
-// app.serviceBusTopic('serviceBusImportProductStock', {
-//   connection: 'SB_CONNECTION_STRING',
-//   topicName: process.env.SB_PRODUCTS_IMPORT_TOPIC_NAME,
-//   subscriptionName: 'sb_stock_subscription',
-//   handler: serviceBusQueueHandler,
-// });
+app.serviceBusTopic('serviceBusImportProductStockSub', {
+  connection: 'SB_CONNECTION_STRING',
+  topicName: process.env.SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE_NAME,
+  subscriptionName: 'sb_stock_subscription',
+  handler: serviceBusQueueHandler,
+});
