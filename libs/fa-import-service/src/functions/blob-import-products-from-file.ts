@@ -36,7 +36,7 @@ export async function importProductsFromFileHandler(
   const fileContent = blob.toString('utf8');
 
   const sbClient = SbService.getSbClient();
-  const sender = SbService.getProductsSender();
+  const sender = SbService.getProductsSender(sbClient);
 
   try {
     const parser = parse(fileContent, {

@@ -14,7 +14,7 @@ export async function serviceBusQueueHandler(
   if (!message || typeof message !== 'object') {
     context.error('Invalid message', message);
 
-    return;
+    return Promise.reject();
   }
 
   try {
@@ -32,27 +32,31 @@ export async function serviceBusQueueHandler(
     await createProduct(newProduct);
 
     context.info(`Created product and stock entity with ${id}`);
+
+    return Promise.resolve();
   } catch (error) {
     context.error('Error creating product', error);
+
+    return Promise.reject();
   }
 }
 
 app.serviceBusQueue('serviceBusImportProduct', {
   connection: 'SB_CONNECTION_STRING',
-  queueName: process.env.SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE,
+  queueName: process.env.SB_PRODUCTS_IMPORT_QUEUE_NAME,
   handler: serviceBusQueueHandler,
 });
 
 // app.serviceBusTopic('serviceBusImportProduct', {
 //   connection: 'SB_CONNECTION_STRING',
-//   topicName: process.env.SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE,
+//   topicName: process.env.SB_PRODUCTS_IMPORT_TOPIC_NAME,
 //   subscriptionName: 'sb_product_subscription',
 //   handler: serviceBusQueueHandler,
 // });
 
 // app.serviceBusTopic('serviceBusImportProductStock', {
 //   connection: 'SB_CONNECTION_STRING',
-//   topicName: process.env.SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE,
+//   topicName: process.env.SB_PRODUCTS_IMPORT_TOPIC_NAME,
 //   subscriptionName: 'sb_stock_subscription',
 //   handler: serviceBusQueueHandler,
 // });

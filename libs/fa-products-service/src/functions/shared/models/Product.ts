@@ -8,11 +8,11 @@ export interface Product {
 }
 
 const ProductStockSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   title: z.string(),
   description: z.string(),
-  price: z.number(),
-  count: z.number(),
+  price: z.coerce.number(),
+  count: z.coerce.number(),
 });
 
 // extract the inferred type
