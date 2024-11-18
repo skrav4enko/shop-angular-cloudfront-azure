@@ -77,17 +77,20 @@ resource "azurerm_windows_function_app" "product_services" {
   app_settings = {
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING = azurerm_storage_account.product_services_storage_account.primary_connection_string
     WEBSITE_CONTENTSHARE                     = azurerm_storage_share.product_services_storage_share.name
-    DB_URI                                   = azurerm_cosmosdb_account.products_db_account.endpoint
-    DB_NAME                                  = azurerm_cosmosdb_sql_database.products_db.name
     DOTNET_USE_POLLING_FILE_WATCHER          = 1
     WEBSITE_RUN_FROM_PACKAGE                 = 1
+    FUNCTIONS_WORKER_RUNTIME                 = "node"
+    DB_URI                                   = azurerm_cosmosdb_account.products_db_account.endpoint
+    DB_NAME                                  = azurerm_cosmosdb_sql_database.products_db.name
+    SB_CONNECTION_STRING                     = azurerm_servicebus_namespace.servicebus_namespace.default_primary_connection_string
+    SB_PRODUCTS_IMPORT_TOPIC_OR_QUEUE_NAME   = var.sb_topic_or_queue_name
   }
 
   # The app settings changes cause downtime on the Function App. e.g. with Azure Function App Slots
   # Therefore it is better to ignore those changes and manage app settings separately off the Terraform.
   lifecycle {
     ignore_changes = [
-      app_settings,
+      # app_settings,
       site_config["application_stack"], // workaround for a bug when azure just "kills" your app
       tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],
