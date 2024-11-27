@@ -3,29 +3,29 @@ resource "azurerm_resource_group" "chatbot_rg" {
   location = var.location
 }
 
-resource "azurerm_container_registry" "chatbot_acr" {
-  name                = "${var.unique_resource_id_prefix}chatbotacr"
+resource "azurerm_container_registry" "chatbot_cr" {
+  name                = "${var.unique_resource_id_prefix}chatbotcr"
   resource_group_name = azurerm_resource_group.chatbot_rg.name
   location            = azurerm_resource_group.chatbot_rg.location
   sku                 = "Basic"
   admin_enabled       = true
 }
 
-# resource "azurerm_log_analytics_workspace" "chatbot_log_analytics_workspace" {
-#   name                = "${var.unique_resource_id_prefix}-chatbot-log-analytics"
-#   location            = azurerm_resource_group.chatbot_rg.location
-#   resource_group_name = azurerm_resource_group.chatbot_rg.name
-# }
+resource "azurerm_log_analytics_workspace" "chatbot_law" {
+  name                = "${var.unique_resource_id_prefix}-chatbot-law"
+  resource_group_name = azurerm_resource_group.chatbot_rg.name
+  location            = azurerm_resource_group.chatbot_rg.location
+}
 
-# resource "azurerm_container_app_environment" "chatbot_cae" {
-#   name                       = "${var.unique_resource_id_prefix}-chatbot-cae"
-#   location                   = azurerm_resource_group.chatbot_rg.location
-#   resource_group_name        = azurerm_resource_group.chatbot_rg.name
-#   log_analytics_workspace_id = azurerm_log_analytics_workspace.chatbot_log_analytics_workspace.id
-# }
+resource "azurerm_container_app_environment" "chatbot_cae" {
+  name                       = "${var.unique_resource_id_prefix}-chatbot-cae"
+  location                   = azurerm_resource_group.chatbot_rg.location
+  resource_group_name        = azurerm_resource_group.chatbot_rg.name
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.chatbot_law.id
+}
 
-# resource "azurerm_container_app" "chatbot_ca_docker_acr" {
-#   name                         = "${var.unique_resource_id_prefix}-chatbot-ca-acr"
+# resource "azurerm_container_app" "hello-world_ca_docker_acr" {
+#   name                         = "${var.unique_resource_id_prefix}-hello-world-ca-acr"
 #   container_app_environment_id = azurerm_container_app_environment.chatbot_cae.id
 #   resource_group_name          = azurerm_resource_group.chatbot_rg.name
 #   revision_mode                = "Single"
@@ -50,8 +50,8 @@ resource "azurerm_container_registry" "chatbot_acr" {
 
 #   template {
 #     container {
-#       name   = "chatbot-container-acr"
-#       image  = "${azurerm_container_registry.chatbot_acr.login_server}/${var.chatbot_container_name}:${var.chatbot_container_tag_acr}"
+#       name   = "hello-world-container-acr"
+#       image  = "${azurerm_container_registry.chatbot_acr.login_server}/${var.hello_world_container_name}:${var.chatbot_container_tag_acr}"
 #       cpu    = 0.25
 #       memory = "0.5Gi"
 

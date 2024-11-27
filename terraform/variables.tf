@@ -11,6 +11,10 @@ variable "unique_resource_id_prefix" {
   default = "uniqueprefix001"
 }
 
+variable "hello_world_container_name" {
+  default = "hello-world-app"
+}
+
 variable "chatbot_container_name" {
   default = "chatbot_app"
 }
